@@ -9,6 +9,10 @@
     <script src="script.js" defer type="module"></script>
 </head>
 <body>
-<main id="sketch-container"></main>
+	<div id="controls">
+		<label>Moon phase: <span id="phaseValue">15</span> / 30</label>
+		<input id="phaseSlider" type="range" min="0" max="30" step="0.1" value="15" />
+	</div>
+	<main id="sketch-container"></main>
 </body>
 </html>

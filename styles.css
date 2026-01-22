@@ -260,3 +260,7 @@ textarea {
         page-break-after: avoid;
     }
 }
+
+#controls { position: absolute; left: 12px; top: 12px; color: #ddd; font-family: sans-serif; z-index: 10; }
+label { display: block; margin-bottom: 6px; }
+input[type="range"] { width: 220px; }
