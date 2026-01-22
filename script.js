@@ -36,12 +36,12 @@ const sketch = (p) => {
 		const phaseClamped = Math.max(0, Math.min(30, phase));
 		
 		// map 0..30 -> 0..TAU (0 and 30 both map to new moon)
-		const alpha = (phaseClamped / 30) * p.TWO_PI + p.PI; // offset by PI so 0 = new moon
+		const alphA = (phaseClamped / 30) * p.TWO_PI + p.PI; // offset by PI so 0 = new moon
 		
 		// compute sun angle projected onto XZ plane
 		const sunAngle = Math.atan2(sunDir.z, sunDir.x);
 		// moon orbital angle = sunAngle + alpha
-		const phi = sunAngle + alpha;
+		const phi = sunAngle + alphA;
 		// Compute moon position around the origin (Earth/camera)
 		const moonX = moonOrbitRadius * Math.cos(phi);
 		const moonZ = moonOrbitRadius * Math.sin(phi);
