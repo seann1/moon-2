@@ -1,7 +1,16 @@
 // javascript
 import p5 from 'p5';
+import ml5 from 'ml5';
+
+// Add these globals near the other DOM/Shader handles
+let video = null;
+let handPose = null;
+let handActive = false;
+let handPhase = 15; // smoothed phase value driven by hand
+let hands = [];
 
 const sketch = (p) => {
+	
 	const moonOrbitRadius = 300;
 	const moonSize = 80;
 	
@@ -98,26 +107,6 @@ vec3 taylorInvSqrt(vec3 r){ return 1.79284291400159 - 0.85373472095314 * r; }
 	  }
 	  `;
 	
-	// // Fragment shader: color by noise + simple directional lighting
-	// const frag = `
-	//   precision mediump float;
-	//   varying vec3 vNormal;
-	//   varying float vNoise;
-	//   uniform vec3 uSunDir;
-	//   void main() {
-	// 	vec3 n = normalize(vNormal);
-	// 	float occ = 0.3; // ambient
-	// 	float light = max(dot(n, normalize(uSunDir)), 0.0);
-	// 	// color ramp: dark bluish -> warm highlight based on noise
-	// 	vec3 dark = vec3(0.08, 0.10, 0.18);
-	// 	vec3 mid  = vec3(0.35, 0.4, 0.5);
-	// 	vec3 high = vec3(1.0, 0.95, 0.9);
-	// 	vec3 col = mix(mix(dark, mid, vNoise), high, pow(light, 1.5));
-	// 	float brightness = occ + 0.7 * light;
-	// 	gl_FragColor = vec4(col * brightness, 1.0);
-	//   }
-	//   `;
-	
 	const frag = `
 	precision mediump float;
 	varying vec3 vNormal;
@@ -158,8 +147,39 @@ vec3 taylorInvSqrt(vec3 r){ return 1.79284291400159 - 0.85373472095314 * r; }
 	  gl_FragColor = vec4(color, 1.0);
 	}
 	`;
+	
+	p.preload = () => {
+		console.log("here")
+		// handPose = ml5.handPose();
+	}
 
 	p.setup = () => {
+		
+		// In p.setup(), after initializing p.createCanvas(...) and before/after grabbing DOM:
+		// create a hidden webcam capture for ml5
+		video = p.createCapture(p.VIDEO);
+		video.size(320, 240);
+		// show the feed as a small overlay in the bottom-right of the page
+		video.style('position', 'absolute');
+		video.style('right', '10px');
+		video.style('bottom', '10px');
+		video.style('width', '180px');      // adjust as desired
+		video.style('height', 'auto');
+		video.style('border', '2px solid rgba(255,255,255,0.6)');
+		video.style('border-radius', '8px');
+		video.style('z-index', '1000');
+		
+		// init handpose model (calls into ml5)
+		// handposeModel = ml5.handPose(video.elt, () => {
+		// 	console.log('handpose ready');
+		// });
+		function gotHands(results) {
+			// Save the output to the hands variable
+			hands = results;
+			// console.log(results)
+		}
+		// handposeModel.detectStart(video, gotHands);
+		// handPose.detectStart(video, gotHands);
 		p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
 		p.noStroke();
 		p.textureMode(p.NORMAL);
@@ -260,8 +280,8 @@ vec3 taylorInvSqrt(vec3 r){ return 1.79284291400159 - 0.85373472095314 * r; }
 		p.directionalLight(255, 255, 220, sunDir.x, sunDir.y, sunDir.z);
 		
 		// read slider value (fallback to 15 if slider missing)
-		const phase = phaseSlider ? parseFloat(phaseSlider.value) : 15;
-		
+		// const phase = phaseSlider ? parseFloat(phaseSlider.value) : 15;
+		const phase = handActive ? handPhase : (phaseSlider ? parseFloat(phaseSlider.value) : 15);
 		drawMoon(moonSize, 200, phase);
 	};
 	
