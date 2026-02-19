@@ -147,14 +147,9 @@ vec3 taylorInvSqrt(vec3 r){ return 1.79284291400159 - 0.85373472095314 * r; }
 	  gl_FragColor = vec4(color, 1.0);
 	}
 	`;
-	
-	p.preload = () => {
-		console.log("here")
-		// handPose = ml5.handPose();
-	}
 
 	p.setup = () => {
-		
+		handPose = ml5.handPose();
 		// In p.setup(), after initializing p.createCanvas(...) and before/after grabbing DOM:
 		// create a hidden webcam capture for ml5
 		video = p.createCapture(p.VIDEO);
@@ -176,10 +171,9 @@ vec3 taylorInvSqrt(vec3 r){ return 1.79284291400159 - 0.85373472095314 * r; }
 		function gotHands(results) {
 			// Save the output to the hands variable
 			hands = results;
-			// console.log(results)
 		}
 		// handposeModel.detectStart(video, gotHands);
-		// handPose.detectStart(video, gotHands);
+		handPose.detectStart(video, gotHands);
 		p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
 		p.noStroke();
 		p.textureMode(p.NORMAL);
